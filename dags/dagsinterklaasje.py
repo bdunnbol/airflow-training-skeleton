@@ -8,8 +8,8 @@ dag = DAG(
     default_args={
         "owner": "naamhierinvullen",
         "start_date": airflow.utils.dates.days_ago(3),
-        "schedule_interval": None,
     },
+    schedule_interval=None,
 )
 
 t1 = BashOperator(
