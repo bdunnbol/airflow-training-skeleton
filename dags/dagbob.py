@@ -11,11 +11,13 @@ dag = DAG(
         "owner": "naamhierinvullen",
         "start_date": airflow.utils.dates.days_ago(7),
     },
-    schedule_interval='@daily',
+    schedule_interval="@daily",
 )
+
 
 def print_weekday(execution_date, **context):
     print(execution_date.strftime("%a"))
+
 
 weekday_person_to_email = {
     0: "Bob",
@@ -24,10 +26,12 @@ weekday_person_to_email = {
     3: "Joe",
     4: "Alice",
     5: "Alice",
-    6: "Alice"
+    6: "Alice",
 }
+
+
 def _who_to_mail(execution_date, **context):
-    return 'mail_' + str(weekday_person_to_email[execution_date.weekday()])
+    return "mail_" + str(weekday_person_to_email[execution_date.weekday()])
 
 
 t1 = PythonOperator(
@@ -38,26 +42,15 @@ t1 = PythonOperator(
 )
 
 t2 = BranchPythonOperator(
-    task_id='branching',
-    python_callable=_who_to_mail,
-    provide_context=True,
-    dag=dag,
+    task_id="branching", python_callable=_who_to_mail, provide_context=True, dag=dag
 )
 
-t3 = BashOperator(
-    task_id="mail_Alice", bash_command="echo Alice", dag=dag
-)
+t3 = BashOperator(task_id="mail_Alice", bash_command="echo Alice", dag=dag)
 
-t4 = BashOperator(
-    task_id="mail_Joe", bash_command="echo Joe", dag=dag
-)
+t4 = BashOperator(task_id="mail_Joe", bash_command="echo Joe", dag=dag)
 
-t5 = BashOperator(
-    task_id="mail_Bob", bash_command="echo Bob", dag=dag
-)
+t5 = BashOperator(task_id="mail_Bob", bash_command="echo Bob", dag=dag)
 
-t6 = DummyOperator(
-    task_id="the_end", dag=dag, trigger_rule='one_success'
-)
+t6 = DummyOperator(task_id="the_end", dag=dag, trigger_rule="one_success")
 
 t1 >> t2 >> [t3, t4, t5] >> t6
