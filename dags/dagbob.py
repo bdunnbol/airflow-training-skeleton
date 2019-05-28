@@ -9,7 +9,7 @@ dag = DAG(
     dag_id="dagbob",
     default_args={
         "owner": "naamhierinvullen",
-        "start_date": airflow.utils.dates.days_ago(3),
+        "start_date": airflow.utils.dates.days_ago(7),
     },
     schedule_interval=None,
 )
@@ -56,7 +56,7 @@ t5 = BashOperator(
 )
 
 t6 = DummyOperator(
-    task_id="the_end", dag=dag
+    task_id="the_end", dag=dag, trigger_rule='one_success'
 )
 
 t1 >> t2 >> [t3, t4, t5] >> t6
