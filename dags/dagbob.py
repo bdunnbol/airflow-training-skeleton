@@ -41,6 +41,7 @@ t2 = BranchPythonOperator(
     task_id='branching',
     python_callable=_who_to_mail,
     provide_context=True,
+    dag=dag,
 )
 
 t3 = BashOperator(
