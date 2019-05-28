@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python_operator import BranchPythonOperator
 
 dag = DAG(
     dag_id="dagbob",
@@ -30,7 +31,7 @@ def _who_to_mail(execution_date, **context):
 
 
 t1 = PythonOperator(
-    task_id="print_exec_date", python_callable=print_weekday, dag=dag
+    task_id="print_exec_date", python_callable=print_weekday, provide_context=True, dag=dag
 )
 
 # t2 = BashOperator(
