@@ -11,7 +11,7 @@ dag = DAG(
         "owner": "naamhierinvullen",
         "start_date": airflow.utils.dates.days_ago(7),
     },
-    schedule_interval=None,
+    schedule_interval='@daily',
 )
 
 def print_weekday(execution_date, **context):
