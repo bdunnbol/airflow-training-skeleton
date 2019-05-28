@@ -31,23 +31,32 @@ def _who_to_mail(execution_date, **context):
 
 
 t1 = PythonOperator(
-    task_id="print_exec_date", python_callable=print_weekday, provide_context=True, dag=dag
+    task_id="print_exec_date",
+    python_callable=print_weekday,
+    provide_context=True,
+    dag=dag,
 )
 
-# t2 = BashOperator(
-#     task_id="wait_5", bash_command="sleep 5", dag=dag
-# )
-#
-# t3 = BashOperator(
-#     task_id="wait_1", bash_command="sleep 1", dag=dag
-# )
-#
-# t4 = BashOperator(
-#     task_id="wait_10", bash_command="sleep 10", dag=dag
-# )
-#
-# t5 = DummyOperator(
-#     task_id="the_end", dag=dag
-# )
-#
-# t1 >> [t2, t3, t4] >> t5
+t2 = BranchPythonOperator(
+    task_id='branching',
+    python_callable=_who_to_mail,
+    provide_context=True,
+)
+
+t3 = BashOperator(
+    task_id="mail_Alice", bash_command="echo Alice", dag=dag
+)
+
+t4 = BashOperator(
+    task_id="mail_Joe", bash_command="echo Joe", dag=dag
+)
+
+t5 = BashOperator(
+    task_id="mail_Bob", bash_command="echo Bob", dag=dag
+)
+
+t6 = DummyOperator(
+    task_id="the_end", dag=dag
+)
+
+t1 >> t2 >> [t3, t4, t5] >> t6
