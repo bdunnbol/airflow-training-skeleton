@@ -133,4 +133,4 @@ exchange_rate_to_gcs = MyOwnOperator(
 [
     prices_uk_from_postgres_to_cloudstorage,
     exchange_rate_to_gcs,
-] >> dataproc_create_cluster >> dataproc_run_pyspark
+] >> dataproc_create_cluster >> dataproc_run_pyspark >> dataproc_remove_cluster
