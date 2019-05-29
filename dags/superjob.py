@@ -12,7 +12,14 @@ from airflow.operators import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.hooks.http_hook import HttpHook
 from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
+from airflow.contrib.operators.dataproc_operator import (
+    DataprocClusterCreateOperator,
+    DataProcPySparkOperator,
+    DataprocClusterDeleteOperator,
+)
+
 import json
+
 
 class MyOwnOperator(BaseOperator):
 
@@ -44,11 +51,9 @@ class MyOwnOperator(BaseOperator):
         r = self._download_from_http()
         r = json.loads(r)
 
-        with open('data.json', 'w') as outfile:
+        with open("data.json", "w") as outfile:
             json.dump(r, outfile)
         self._upload_to_gcs()
-
-
 
     def _upload_to_gcs(self):
         """
@@ -59,9 +64,7 @@ class MyOwnOperator(BaseOperator):
             google_cloud_storage_conn_id=self.gcs_connection_id
         )
 
-        hook.upload(
-            self.gcs_bucket, self.gcs_filename, "data.json", "application/json"
-        )
+        hook.upload(self.gcs_bucket, self.gcs_filename, "data.json", "application/json")
 
     def _download_from_http(self):
         http = HttpHook("GET", http_conn_id=self.http_connection_id)
@@ -82,6 +85,15 @@ dag = DAG(
     catchup=False,
 )
 
+dataproc_create_cluster = DataprocClusterCreateOperator(
+    task_id="create_cluster",
+    cluster_name="analyse-pricing-{{ ds }}",
+    project_id="airflowbolcom-may2829-b2a87b4d",
+    num_workers=2,
+    zone="europe-west4-a",
+    dag=dag,
+)
+
 
 pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     task_id="prices_uk_from_postgres_to_cloudstorage",
@@ -92,7 +104,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     dag=dag,
 )
 
-myown = MyOwnOperator(
+exchange_rate_to_gcs = MyOwnOperator(
     task_id="myown",
     dag=dag,
     http_connection_id="http_exchangerate",
@@ -103,4 +115,4 @@ myown = MyOwnOperator(
 )
 
 
-myown >> pgsl_to_gcs
+[pgsl_to_gcs, exchange_rate_to_gcs] >> dataproc_create_cluster
