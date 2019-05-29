@@ -12,7 +12,7 @@ from airflow.operators import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.hooks.http_hook import HttpHook
 from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
-
+import json
 
 class MyOwnOperator(BaseOperator):
 
@@ -41,8 +41,13 @@ class MyOwnOperator(BaseOperator):
 
     def execute(self, context):
         print("exec")
-        self._download_from_http()
+        r = self._download_from_http()
+
+        with open('data.json', 'w') as outfile:
+            json.dump(r, outfile)
         self._upload_to_gcs()
+
+
 
     def _upload_to_gcs(self):
         """
@@ -54,7 +59,7 @@ class MyOwnOperator(BaseOperator):
         )
 
         hook.upload(
-            self.gcs_bucket, "imthecontent", self.gcs_filename, "application/json"
+            self.gcs_bucket, self.gcs_filename, "data.json", "application/json"
         )
 
     def _download_from_http(self):
@@ -93,7 +98,7 @@ myown = MyOwnOperator(
     http_endpoint="/airflow-training-transform-valutas?date={{ ds }}&to=EUR",
     gcs_connection_id="google_cloud_default",
     gcs_bucket="een_emmer",
-    gcs_filename="exchangerate_{{ ds }}",
+    gcs_filename="exchangerate_{{ ds }}.txt",
 )
 
 
