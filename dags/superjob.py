@@ -11,6 +11,7 @@ from airflow_training.operators.postgres_to_gcs import (
 from airflow.operators import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.hooks.http_hook import HttpHook
+import json
 
 class MyOwnOperator(BaseOperator):
 
@@ -44,6 +45,9 @@ class MyOwnOperator(BaseOperator):
         self.log.info(self.endpoint + " is the endpoint")
         response = http.run("/airflow-training-transform-valutas?date=2018-01-01&to=EUR")
         self.log.info(response)
+        self.log.info(response.text)
+        self.log.info(json.loads(response.text))
+        return response.text
 
 dag = DAG(
     dag_id="superjob",
