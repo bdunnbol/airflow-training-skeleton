@@ -23,7 +23,6 @@ class MyOwnOperator(BaseOperator):
 
     def execute(self, context):
         print("exec")
-        self.log("Im a log message")
 
 dag = DAG(
     dag_id="superjob",
