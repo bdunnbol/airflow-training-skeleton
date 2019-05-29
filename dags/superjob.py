@@ -65,7 +65,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     dag=dag,
 )
 
-myown = MyOwnOperator(task_id='myown', dag=dag, endpoint="google.com")
+myown = MyOwnOperator(task_id='myown', dag=dag, endpoint="https://www.google.com")
 
 
 myown >> pgsl_to_gcs
