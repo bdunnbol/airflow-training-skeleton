@@ -25,9 +25,6 @@ class MyOwnOperator(BaseOperator):
 
     template_fields = ("http_endpoint", "gcs_filename")
 
-    ui_color = "#0090e3"
-    ui_fgcolor = "#000000"
-
     @apply_defaults
     def __init__(
         self,
@@ -86,7 +83,7 @@ dag = DAG(
 )
 
 dataproc_create_cluster = DataprocClusterCreateOperator(
-    task_id="create_cluster",
+    task_id="dataproc_create_cluster",
     cluster_name="analyse-pricing-{{ ds }}",
     project_id="airflowbolcom-may2829-b2a87b4d",
     num_workers=2,
@@ -95,7 +92,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 )
 
 
-pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
+prices_uk_from_postgres_to_cloudstorage = PostgresToGoogleCloudStorageOperator(
     task_id="prices_uk_from_postgres_to_cloudstorage",
     sql="SELECT * FROM land_registry_price_paid_uk WHERE transfer_date = '{{ ds }}'",
     bucket="een_emmer",
@@ -105,7 +102,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
 )
 
 exchange_rate_to_gcs = MyOwnOperator(
-    task_id="myown",
+    task_id="exchange_rate_to_gcs",
     dag=dag,
     http_connection_id="http_exchangerate",
     http_endpoint="/airflow-training-transform-valutas?date={{ ds }}&to=EUR",
@@ -115,4 +112,4 @@ exchange_rate_to_gcs = MyOwnOperator(
 )
 
 
-[pgsl_to_gcs, exchange_rate_to_gcs] >> dataproc_create_cluster
+[prices_uk_from_postgres_to_cloudstorage, exchange_rate_to_gcs] >> dataproc_create_cluster
