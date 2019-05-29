@@ -42,7 +42,7 @@ class MyOwnOperator(BaseOperator):
     def execute(self, context):
         print("exec")
         r = self._download_from_http()
-
+        r = json.dumps(r)
         with open('data.json', 'w') as outfile:
             json.dump(r, outfile)
         self._upload_to_gcs()
