@@ -16,6 +16,8 @@ from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 
 class MyOwnOperator(BaseOperator):
 
+    template_fields = ("http_endpoint", "gcs_filename")
+
     ui_color = "#0090e3"
     ui_fgcolor = "#000000"
 
@@ -91,7 +93,7 @@ myown = MyOwnOperator(
     http_endpoint="/airflow-training-transform-valutas?date={{ ds }}&to=EUR",
     gcs_connection_id="google_cloud_default",
     gcs_bucket="een_emmer",
-    gcs_filename="exchangerate_{{ds}}",
+    gcs_filename="exchangerate_{{ ds }}",
 )
 
 
