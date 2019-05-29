@@ -94,6 +94,8 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 dataproc_remove_cluster = DataprocClusterDeleteOperator(
     task_id="dataproc_remove_cluster",
     cluster_name="analyse-pricing-{{ ds }}",
+    project_id="airflowbolcom-may2829-b2a87b4d",
+    dag=dag,
 )
 
 dataproc_run_pyspark = DataProcPySparkOperator(
