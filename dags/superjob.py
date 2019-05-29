@@ -91,6 +91,11 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
+dataproc_remove_cluster = DataprocClusterDeleteOperator(
+    task_id="dataproc_remove_cluster",
+    cluster_name="analyse-pricing-{{ ds }}",
+)
+
 dataproc_run_pyspark = DataProcPySparkOperator(
     task_id="dataproc_run_pyspark",
     main="gs://een_emmer/build_statistics.py",
