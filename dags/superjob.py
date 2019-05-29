@@ -18,6 +18,7 @@ from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterDeleteOperator,
 )
 
+from airflow_training.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 import json
 
 
@@ -128,6 +129,15 @@ exchange_rate_to_gcs = MyOwnOperator(
     gcs_bucket="een_emmer",
     gcs_filename="exchangerate_{{ ds }}.txt",
 )
+
+write_to_bq = GoogleCloudStorageToBigQueryOperator(
+    task_id="write_to_bq",
+    bucket="een_emmer",
+    source_objects=["dataproc_output_{{ ds }}/*"],
+    destination_project_dataset_table="airflowbolcom-may2829-b2a87b4d:ditiseendataset.land_registry_prices{{ ds_nodash }}",
+    source_format="PARQUET",
+    write_disposition="WRITE_TRUNCATE",
+    dag=dag,)
 
 
 [
