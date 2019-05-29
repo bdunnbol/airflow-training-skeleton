@@ -143,4 +143,4 @@ write_to_bq = GoogleCloudStorageToBigQueryOperator(
 [
     prices_uk_from_postgres_to_cloudstorage,
     exchange_rate_to_gcs,
-] >> dataproc_create_cluster >> dataproc_run_pyspark >> dataproc_remove_cluster
+] >> dataproc_create_cluster >> dataproc_run_pyspark >> dataproc_remove_cluster >> write_to_bq
