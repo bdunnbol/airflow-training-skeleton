@@ -100,6 +100,7 @@ dataproc_run_pyspark = DataProcPySparkOperator(
         "gs://een_emmer/exchangerate_{{ ds }}.txt",
         "gs://een_emmer/dataproc_output_{{ ds }}",
     ],
+    dag=dag,
 )
 
 prices_uk_from_postgres_to_cloudstorage = PostgresToGoogleCloudStorageOperator(
