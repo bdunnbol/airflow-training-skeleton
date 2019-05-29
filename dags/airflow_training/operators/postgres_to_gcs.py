@@ -37,7 +37,6 @@ class PostgresToGoogleCloudStorageOperator(BaseOperator):
 
     template_fields = ("sql", "bucket", "filename", "schema_filename", "parameters")
     template_ext = (".sql",)
-    ui_color = "#a0e08c"
 
     @apply_defaults
     def __init__(

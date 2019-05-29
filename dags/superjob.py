@@ -91,6 +91,16 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
+dataproc_run_pyspark = DataProcPySparkOperator(
+    task_id="dataproc_run_pyspark",
+    main="gs://een_emmer/build_statistics.py",
+    cluster_name="analyse-pricing-{{ ds }}",
+    arguments=[
+        "gs://een_emmer/daily_load_{{ ds }}",
+        "gs://een_emmer/exchangerate_{{ ds }}.txt",
+        "gs://een_emmer/dataproc_output_{{ ds }}",
+    ],
+)
 
 prices_uk_from_postgres_to_cloudstorage = PostgresToGoogleCloudStorageOperator(
     task_id="prices_uk_from_postgres_to_cloudstorage",
@@ -112,4 +122,7 @@ exchange_rate_to_gcs = MyOwnOperator(
 )
 
 
-[prices_uk_from_postgres_to_cloudstorage, exchange_rate_to_gcs] >> dataproc_create_cluster
+[
+    prices_uk_from_postgres_to_cloudstorage,
+    exchange_rate_to_gcs,
+] >> dataproc_create_cluster >> dataproc_run_pyspark
