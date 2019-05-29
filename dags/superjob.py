@@ -39,10 +39,10 @@ class MyOwnOperator(BaseOperator):
     #         hook.upload(self.bucket, object, tmp_file_handle.name, "application/json")
 
     def _download_from_http(self):
-        http = HttpHook('GET')
+        http = HttpHook('GET', base_url='https://google.com')
         self.log.info("Calling HTTP method")
-
-        response = http.run(self.endpoint)
+        self.log.info(self.endpoint + " is the endpoint")
+        response = http.run("/")
         self.log.info(response)
 
 dag = DAG(
