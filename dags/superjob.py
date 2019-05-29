@@ -88,7 +88,7 @@ myown = MyOwnOperator(
     task_id="myown",
     dag=dag,
     http_connection_id="http_exchangerate",
-    http_endpoint="/airflow-training-transform-valutas?date={{  ds  }}&to=EUR",
+    http_endpoint="/airflow-training-transform-valutas?date={{ ds }}&to=EUR",
     gcs_connection_id="google_cloud_default",
     gcs_bucket="een_emmer",
     gcs_filename="exchangerate_{{ds}}",
