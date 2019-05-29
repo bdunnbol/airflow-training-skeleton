@@ -4,11 +4,13 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
+from airflow.operators.http_operator import SimpleHttpOperator
 from airflow_training.operators.postgres_to_gcs import (
     PostgresToGoogleCloudStorageOperator,
 )
 from airflow.operators import BaseOperator
 from airflow.utils.decorators import apply_defaults
+from airflow.hooks.http_hook import HttpHook
 
 class MyOwnOperator(BaseOperator):
 
@@ -16,13 +18,32 @@ class MyOwnOperator(BaseOperator):
     ui_fgcolor = '#000000'
 
     @apply_defaults
-    def __init__(self, *args, **kwargs):
+    def __init__(self, endpoint, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        def execute(self, context):
-            pass
+        self.endpoint = endpoint
 
     def execute(self, context):
         print("exec")
+        self._download_from_http()
+
+    # def _upload_to_gcs(self):
+    #     """
+    #     Upload all of the file splits (and optionally the schema .json file) to
+    #     Google Cloud Storage.
+    #     """
+    #     hook = GoogleCloudStorageHook(
+    #         google_cloud_storage_conn_id=self.google_cloud_storage_conn_id,
+    #         delegate_to=self.delegate_to,
+    #     )
+    #     for object, tmp_file_handle in files_to_upload.items():
+    #         hook.upload(self.bucket, object, tmp_file_handle.name, "application/json")
+
+    def _download_from_http(self):
+        http = HttpHook('GET')
+        self.log.info("Calling HTTP method")
+
+        response = http.run(self.endpoint)
+        self.log.info(response)
 
 dag = DAG(
     dag_id="superjob",
@@ -44,7 +65,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     dag=dag,
 )
 
-myown = MyOwnOperator(task_id='myown', dag=dag)
+myown = MyOwnOperator(task_id='myown', dag=dag, endpoint="google.com")
 
 
 myown >> pgsl_to_gcs
